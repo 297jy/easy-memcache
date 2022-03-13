@@ -24,6 +24,10 @@ public class SystemConfig {
 
     private Long tokenExpireSeconds;
 
+    private String avatar;
+
+    private String introduction;
+
     @PostConstruct
     private void init() {
         JSONObject configJsonObject = JsonUtils.readJsonObjectFromFile(SystemConfigConstant.SYSTEM_CONFIG_PATH);
@@ -32,5 +36,7 @@ public class SystemConfig {
         tokenPath = configJsonObject.getString(SystemConfigConstant.TOKEN_PATH_KEY);
         authSecret = configJsonObject.getString(SystemConfigConstant.AUTH_SECRET_KEY);
         tokenExpireSeconds = configJsonObject.getLong(SystemConfigConstant.TOKEN_EXPIRE_SECONDS_KEY);
+        avatar = configJsonObject.getString(SystemConfigConstant.AVATAR_KEY);
+        introduction = configJsonObject.getString(SystemConfigConstant.INTRODUCTION_KEY);
     }
 }

@@ -21,7 +21,7 @@ public class JsonUtils {
                 allLines.add(line);
                 line = configReader.readLine();
             }
-            String configJsonStr = StringUtils.join(allLines);
+            String configJsonStr = StringUtils.join(allLines, "");
             return JSONObject.parseObject(configJsonStr);
         } catch (Throwable e) {
             log.error("readJsonObjectFromFile失败，{%s}", e);
@@ -41,6 +41,9 @@ public class JsonUtils {
         BufferedWriter configWriter = null;
         try {
             JSONObject configJson = readJsonObjectFromFile(filename);
+            if (configJson == null) {
+                configJson = new JSONObject();
+            }
             configJson.putAll(data);
             configWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename)));
             configWriter.write(configJson.toJSONString());

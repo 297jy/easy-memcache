@@ -23,11 +23,11 @@ public class Result {
     }
 
     public Result success() {
-        return setResult(200, "Success", null);
+        return setResult(20000, "Success", null);
     }
 
     public Result success(Object data) {
-        return setResult(200, "Success", data);
+        return setResult(20000, "Success", data);
     }
 
     public Result fail(Object data, String message) {

@@ -20,15 +20,18 @@ public class AuthValidateInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        Method method = handlerMethod.getMethod();
-        Auth authAnnotation = method.getAnnotation(Auth.class);
-        if (authAnnotation != null) {
-            if (authAnnotation.required()) {
-                String token = request.getHeader("X-Token");
-                return defaultAuthService.isValidToken(token);
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Method method = handlerMethod.getMethod();
+            Auth authAnnotation = method.getAnnotation(Auth.class);
+            if (authAnnotation != null) {
+                if (authAnnotation.required()) {
+                    String token = request.getHeader("X-Token");
+                    return defaultAuthService.isValidToken(token);
+                }
             }
         }
+
         return true;
     }
 }
