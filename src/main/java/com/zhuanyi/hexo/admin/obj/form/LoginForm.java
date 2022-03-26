@@ -1,4 +1,4 @@
-package com.zhuanyi.hexo.admin.form;
+package com.zhuanyi.hexo.admin.obj.form;
 
 import lombok.Data;
 

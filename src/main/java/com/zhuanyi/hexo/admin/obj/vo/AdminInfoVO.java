@@ -1,4 +1,4 @@
-package com.zhuanyi.hexo.admin.vo;
+package com.zhuanyi.hexo.admin.obj.vo;
 
 import lombok.Data;
 

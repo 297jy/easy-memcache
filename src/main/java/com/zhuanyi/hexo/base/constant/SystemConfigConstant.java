@@ -19,6 +19,6 @@ public class SystemConfigConstant {
 
     public static final String INTRODUCTION_KEY = "introduction";
 
-
+    public static final String HEXO_PATH_KEY = "hexoPath";
 
 }

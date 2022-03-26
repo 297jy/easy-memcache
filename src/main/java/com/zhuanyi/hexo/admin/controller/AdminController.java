@@ -1,8 +1,8 @@
 package com.zhuanyi.hexo.admin.controller;
 
-import com.zhuanyi.hexo.admin.form.LoginForm;
+import com.zhuanyi.hexo.admin.obj.form.LoginForm;
 import com.zhuanyi.hexo.admin.service.AdminService;
-import com.zhuanyi.hexo.admin.vo.AdminInfoVO;
+import com.zhuanyi.hexo.admin.obj.vo.AdminInfoVO;
 import com.zhuanyi.hexo.auth.annotation.Auth;
 import com.zhuanyi.hexo.base.entity.Result;
 import org.springframework.web.bind.annotation.*;

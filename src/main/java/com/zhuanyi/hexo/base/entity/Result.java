@@ -34,6 +34,14 @@ public class Result {
         return setResult(400, message, data);
     }
 
+    public Result fail(String message) {
+        return setResult(400, message, null);
+    }
+
+    public Result fail() {
+        return setResult(400, "", null);
+    }
+
     public Result fail(Object data, String message, int code) {
         return setResult(code, message, data);
     }

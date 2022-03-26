@@ -28,6 +28,8 @@ public class SystemConfig {
 
     private String introduction;
 
+    private String hexoPath;
+
     @PostConstruct
     private void init() {
         JSONObject configJsonObject = JsonUtils.readJsonObjectFromFile(SystemConfigConstant.SYSTEM_CONFIG_PATH);
@@ -38,5 +40,6 @@ public class SystemConfig {
         tokenExpireSeconds = configJsonObject.getLong(SystemConfigConstant.TOKEN_EXPIRE_SECONDS_KEY);
         avatar = configJsonObject.getString(SystemConfigConstant.AVATAR_KEY);
         introduction = configJsonObject.getString(SystemConfigConstant.INTRODUCTION_KEY);
+        hexoPath = configJsonObject.getString(SystemConfigConstant.HEXO_PATH_KEY);
     }
 }
