@@ -1,7 +1,7 @@
 package com.zhuanyi.hexo.auth.service.impl;
 
 import com.zhuanyi.hexo.auth.bo.TokenBO;
-import com.zhuanyi.hexo.auth.config.SystemConfig;
+import com.zhuanyi.hexo.admin.config.SystemConfig;
 import com.zhuanyi.hexo.auth.dao.TokenDao;
 import com.zhuanyi.hexo.auth.service.AuthService;
 import com.zhuanyi.hexo.base.enums.ServiceExceptionEnum;

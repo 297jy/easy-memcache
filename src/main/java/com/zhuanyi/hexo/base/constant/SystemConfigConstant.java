@@ -21,4 +21,6 @@ public class SystemConfigConstant {
 
     public static final String HEXO_PATH_KEY = "hexoPath";
 
+    public static final String HEXO_SOURCE_PATH_KEY = "hexoSourcePath";
+
 }

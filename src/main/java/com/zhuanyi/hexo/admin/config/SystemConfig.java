@@ -1,4 +1,4 @@
-package com.zhuanyi.hexo.auth.config;
+package com.zhuanyi.hexo.admin.config;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanyi.hexo.base.constant.SystemConfigConstant;
@@ -30,6 +30,8 @@ public class SystemConfig {
 
     private String hexoPath;
 
+    private String hexoSourcePath;
+
     @PostConstruct
     private void init() {
         JSONObject configJsonObject = JsonUtils.readJsonObjectFromFile(SystemConfigConstant.SYSTEM_CONFIG_PATH);
@@ -40,6 +42,6 @@ public class SystemConfig {
         tokenExpireSeconds = configJsonObject.getLong(SystemConfigConstant.TOKEN_EXPIRE_SECONDS_KEY);
         avatar = configJsonObject.getString(SystemConfigConstant.AVATAR_KEY);
         introduction = configJsonObject.getString(SystemConfigConstant.INTRODUCTION_KEY);
-        hexoPath = configJsonObject.getString(SystemConfigConstant.HEXO_PATH_KEY);
+        hexoSourcePath = configJsonObject.getString(SystemConfigConstant.HEXO_SOURCE_PATH_KEY);
     }
 }

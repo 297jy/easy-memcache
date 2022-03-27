@@ -10,8 +10,6 @@ public class Article {
     //文章封面图片
     private String cover;
 
-    private String author;
-
     private List<String> categories;
 
     private List<String> tags;

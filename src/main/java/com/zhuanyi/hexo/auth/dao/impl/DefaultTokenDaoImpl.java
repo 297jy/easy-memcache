@@ -2,7 +2,7 @@ package com.zhuanyi.hexo.auth.dao.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhuanyi.hexo.auth.bo.TokenBO;
-import com.zhuanyi.hexo.auth.config.SystemConfig;
+import com.zhuanyi.hexo.admin.config.SystemConfig;
 import com.zhuanyi.hexo.auth.dao.TokenDao;
 import com.zhuanyi.hexo.base.utils.JsonUtils;
 import org.springframework.stereotype.Component;
