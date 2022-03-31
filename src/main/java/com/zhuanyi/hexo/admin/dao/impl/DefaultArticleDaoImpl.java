@@ -38,6 +38,7 @@ public class DefaultArticleDaoImpl implements ArticleDao {
 
     @Override
     public boolean saveArticle(Article article) {
+        System.out.println(article);
         return defaultHexoFileManage.saveArticle(article);
     }
 
