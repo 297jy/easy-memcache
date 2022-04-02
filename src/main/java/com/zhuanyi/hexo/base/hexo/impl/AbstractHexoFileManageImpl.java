@@ -19,13 +19,34 @@ import java.util.List;
 @Component
 public abstract class AbstractHexoFileManageImpl implements HexoFileManage {
 
+    public static final String MD_SUFFIX = ".md";
+
     @Resource
     private SystemConfig systemConfig;
 
     @Override
-    public Article readArticle(String title) {
-        String path = systemConfig.getHexoSourcePath() + File.separator + title + ".md";
-        if (!FileUtils.existFile(title)) {
+    public List<Article> readAllArticles() {
+        List<Article> articles = new ArrayList<>();
+        List<String> titles = FileUtils.getFileNames(systemConfig.getHexoSourcePath());
+        for (String title : titles) {
+            if (title.endsWith(MD_SUFFIX)) {
+                Long id = Long.valueOf(title.replace(MD_SUFFIX, ""));
+                Article article = readArticleById(id);
+                if (article != null) {
+                    articles.add(article);
+                } else {
+                    log.error("读取文章失败：{}", title);
+                }
+            }
+        }
+        return articles;
+    }
+
+    @Override
+    public Article readArticleById(Long id) {
+        String path = systemConfig.getHexoSourcePath() + File.separator + id + ".md";
+        if (!FileUtils.existFile(path)) {
+            log.error(path + "文件不存在");
             return null;
         }
 
@@ -35,6 +56,8 @@ public abstract class AbstractHexoFileManageImpl implements HexoFileManage {
             return null;
         }
 
+        article.setId(id);
+        article.setAuthor(getArticleAuthor(lines));
         article.setTitle(getArticleTitle(lines));
         article.setCategories(getArticleCategories(lines));
         article.setContent(getArticleContent(lines));
@@ -47,9 +70,11 @@ public abstract class AbstractHexoFileManageImpl implements HexoFileManage {
 
     @Override
     public boolean saveArticle(Article article) {
-        String path = systemConfig.getHexoSourcePath() + File.separator + article.getTitle() + ".md";
+        Long id = article.getId();
+        String path = systemConfig.getHexoSourcePath() + File.separator + id + ".md";
         List<String> hexoFileLines = new ArrayList<>();
         hexoFileLines.add("---");
+        hexoFileLines.addAll(getHexoAuthor(article.getAuthor()));
         hexoFileLines.addAll(getHexoTitle(article.getTitle()));
         hexoFileLines.addAll(getHexoTags(article.getTags()));
         hexoFileLines.addAll(getHexoCategories(article.getCategories()));
@@ -64,10 +89,25 @@ public abstract class AbstractHexoFileManageImpl implements HexoFileManage {
     }
 
     @Override
-    public boolean deleteArticle(String title) {
-        String path = systemConfig.getHexoSourcePath() + File.separator + title + ".md";
+    public Long getNewArticleId() {
+        long maxId = 0L;
+        List<String> titles = FileUtils.getFileNames(systemConfig.getHexoSourcePath());
+        for (String title : titles) {
+            if (title.endsWith(MD_SUFFIX)) {
+                long id = Long.parseLong(title.replace(MD_SUFFIX, ""));
+                maxId = Math.max(maxId, id);
+            }
+        }
+        return maxId + 1;
+    }
+
+    @Override
+    public boolean deleteArticleById(Long id) {
+        String path = systemConfig.getHexoSourcePath() + File.separator + id + MD_SUFFIX;
         return FileUtils.deleteFile(path);
     }
+
+    public abstract String getArticleAuthor(List<String> hexoContentLines);
 
     public abstract String getArticleTitle(List<String> hexoContentLines);
 
@@ -82,6 +122,8 @@ public abstract class AbstractHexoFileManageImpl implements HexoFileManage {
     public abstract String getArticleCover(List<String> hexoContentLines);
 
     public abstract String getArticleContent(List<String> hexoContentLines);
+
+    public abstract List<String> getHexoAuthor(String author);
 
     public abstract List<String> getHexoTitle(String title);
 

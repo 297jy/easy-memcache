@@ -13,6 +13,17 @@ import java.util.List;
 public class DefaultHexoFileManageImpl extends AbstractHexoFileManageImpl {
 
     @Override
+    public String getArticleAuthor(List<String> hexoContentLines) {
+        if (CollectionUtils.isEmpty(hexoContentLines)) {
+            return null;
+        }
+
+        String titleLine = hexoContentLines.stream().filter(line -> line.trim().startsWith("author:"))
+                .findFirst().orElse("");
+        return titleLine.replace("author:", "").trim();
+    }
+
+    @Override
     public String getArticleTitle(List<String> hexoContentLines) {
         if (CollectionUtils.isEmpty(hexoContentLines)) {
             return null;
@@ -74,6 +85,11 @@ public class DefaultHexoFileManageImpl extends AbstractHexoFileManageImpl {
             return StringUtils.join(hexoContentLines.subList(startIndex, hexoContentLines.size()), "").trim();
         }
         return "";
+    }
+
+    @Override
+    public List<String> getHexoAuthor(String author) {
+        return Collections.singletonList("author: " + author);
     }
 
     @Override

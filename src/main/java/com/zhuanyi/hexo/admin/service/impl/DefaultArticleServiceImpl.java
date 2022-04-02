@@ -2,8 +2,8 @@ package com.zhuanyi.hexo.admin.service.impl;
 
 import com.zhuanyi.hexo.admin.dao.ArticleDao;
 import com.zhuanyi.hexo.admin.obj.dto.ArticleDTO;
-import com.zhuanyi.hexo.admin.obj.form.ArticleForm;
 import com.zhuanyi.hexo.admin.obj.pojo.Article;
+import com.zhuanyi.hexo.admin.obj.vo.ArticleListVO;
 import com.zhuanyi.hexo.admin.obj.vo.ArticleVO;
 import com.zhuanyi.hexo.admin.service.ArticleService;
 import org.springframework.beans.BeanUtils;
@@ -21,32 +21,32 @@ public class DefaultArticleServiceImpl implements ArticleService {
     private ArticleDao defaultArticleDao;
 
     @Override
-    public List<ArticleVO> findAllArticles(Integer page, Integer limit) {
+    public ArticleListVO findAllArticles(Integer page, Integer limit) {
         List<Article> articles = defaultArticleDao.findAllArticles();
         return paging(articles, page, limit);
     }
 
-    private List<ArticleVO> paging(List<Article> articles, Integer page, Integer limit) {
+    private ArticleListVO paging(List<Article> articles, Integer page, Integer limit) {
         Collections.sort(articles);
         int startIndex = Math.min((page - 1) * limit, articles.size());
         int endIndex = Math.min(page * limit, articles.size());
+        int no = startIndex + 1;
+        int total = articles.size();
 
         articles = articles.subList(startIndex, endIndex);
         List<ArticleVO> articleVOS = new ArrayList<>();
         for (Article article : articles) {
-            ArticleVO articleVO = new ArticleVO();
-            BeanUtils.copyProperties(article, articleVO);
+            ArticleVO articleVO = new ArticleVO(article);
+            articleVO.setNo(no++);
             articleVOS.add(articleVO);
         }
-        return articleVOS;
+        return new ArticleListVO(articleVOS, total);
     }
 
     @Override
-    public ArticleVO findArticleByTitle(String title) {
-        Article article = defaultArticleDao.findArticleByTitle(title);
-        ArticleVO articleVO = new ArticleVO();
-        BeanUtils.copyProperties(article, articleVO);
-        return articleVO;
+    public ArticleVO findArticleById(Long id) {
+        Article article = defaultArticleDao.findArticleById(id);
+        return new ArticleVO(article);
     }
 
     @Override
@@ -57,15 +57,15 @@ public class DefaultArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public boolean updateByTitle(ArticleForm articleForm, String title) {
+    public boolean update(ArticleDTO articleDTO) {
         Article article = new Article();
-        BeanUtils.copyProperties(articleForm, article);
-        return defaultArticleDao.updateArticleByTitle(article, title);
+        BeanUtils.copyProperties(articleDTO, article);
+        return defaultArticleDao.updateArticle(article);
     }
 
     @Override
-    public boolean deleteByTitle(String title) {
-        return defaultArticleDao.deleteArticleByTitle(title);
+    public boolean deleteById(Long id) {
+        return defaultArticleDao.deleteArticleById(id);
     }
 
 }

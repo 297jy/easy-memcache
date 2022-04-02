@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class Article implements Comparable<Article>{
 
+    private Long id;
     //文章封面图片
     private String cover;
 
@@ -23,6 +24,8 @@ public class Article implements Comparable<Article>{
     private String status;
 
     private String title;
+
+    private String author;
 
     //关键词
     private String keyWords;

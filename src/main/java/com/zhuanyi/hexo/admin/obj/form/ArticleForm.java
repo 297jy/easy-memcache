@@ -3,10 +3,11 @@ package com.zhuanyi.hexo.admin.obj.form;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 public class ArticleForm {
+
+    private Long id;
 
     //文章封面图片
     private String cover;
@@ -27,4 +28,6 @@ public class ArticleForm {
 
     //关键词
     private String keyWords;
+
+    private String author;
 }

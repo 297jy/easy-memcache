@@ -2,12 +2,18 @@ package com.zhuanyi.hexo.base.hexo;
 
 import com.zhuanyi.hexo.admin.obj.pojo.Article;
 
+import java.util.List;
+
 public interface HexoFileManage {
 
-    Article readArticle(String title);
+    List<Article> readAllArticles();
+
+    Article readArticleById(Long id);
 
     boolean saveArticle(Article article);
 
-    boolean deleteArticle(String title);
+    boolean deleteArticleById(Long id);
+
+    Long getNewArticleId();
 
 }

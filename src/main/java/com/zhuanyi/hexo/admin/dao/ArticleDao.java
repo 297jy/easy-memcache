@@ -6,14 +6,14 @@ import java.util.List;
 
 public interface ArticleDao {
 
-    Article findArticleByTitle(String title);
+    Article findArticleById(Long id);
 
     List<Article> findAllArticles();
 
     boolean saveArticle(Article article);
 
-    boolean updateArticleByTitle(Article article, String title);
+    boolean updateArticle(Article article);
 
-    boolean deleteArticleByTitle(String title);
+    boolean deleteArticleById(Long id);
 
 }

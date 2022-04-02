@@ -56,7 +56,7 @@ public class FileUtils {
         }
     }
 
-    public static List<String> getFiles(String path) {
+    public static List<String> getFileNames(String path) {
         List<String> files = new ArrayList<>();
         File file = new File(path);
         File[] tempList = file.listFiles();
