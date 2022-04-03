@@ -1,11 +1,15 @@
 package com.zhuanyi.hexo.admin.controller;
 
+import com.zhuanyi.hexo.admin.obj.dto.SystemSettingDTO;
 import com.zhuanyi.hexo.admin.obj.form.LoginForm;
+import com.zhuanyi.hexo.admin.obj.form.SystemSettingForm;
 import com.zhuanyi.hexo.admin.obj.vo.SystemSettingVO;
 import com.zhuanyi.hexo.admin.service.AdminService;
 import com.zhuanyi.hexo.admin.obj.vo.AdminInfoVO;
 import com.zhuanyi.hexo.auth.annotation.Auth;
 import com.zhuanyi.hexo.base.entity.Result;
+import com.zhuanyi.hexo.base.utils.ResultUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -48,6 +52,16 @@ public class AdminController {
     public Result getSystemSetting() {
         SystemSettingVO systemSettingVO = defaultAdminService.getSystemSetting();
         return new Result().success(systemSettingVO);
+    }
+
+    @Auth
+    @PostMapping("/update-system-setting")
+    public Result updateSystemSetting(@RequestBody SystemSettingForm systemSettingForm) {
+        System.out.println(systemSettingForm.getAutoSaveArticleTimeIntervalMinutes());
+        SystemSettingDTO systemSettingDTO = new SystemSettingDTO();
+        BeanUtils.copyProperties(systemSettingForm, systemSettingDTO);
+        boolean result = defaultAdminService.updateSystemSetting(systemSettingDTO);
+        return result ? ResultUtils.success() : ResultUtils.error();
     }
 
 }

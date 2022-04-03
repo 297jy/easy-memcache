@@ -15,13 +15,11 @@ public class SystemConfigConstant {
     //过期时间，以秒为单位
     public static final String TOKEN_EXPIRE_SECONDS_KEY = "token_expire_seconds";
 
-    public static final String AUTO_SAVE_ARTICLE_TIME_INTERVAL_MINUTES_KEY = "auto_save_article_time_interval_minute";
+    public static final String AUTO_SAVE_ARTICLE_TIME_INTERVAL_MINUTES_KEY = "auto_save_article_time_interval_minutes";
 
     public static final String AVATAR_KEY = "avatar";
 
     public static final String INTRODUCTION_KEY = "introduction";
-
-    public static final String HEXO_PATH_KEY = "hexoPath";
 
     public static final String HEXO_SOURCE_PATH_KEY = "hexo_source_path";
 

@@ -1,5 +1,7 @@
 package com.zhuanyi.hexo.admin.service.impl;
 
+import com.zhuanyi.hexo.admin.dao.SystemSettingDao;
+import com.zhuanyi.hexo.admin.obj.dto.SystemSettingDTO;
 import com.zhuanyi.hexo.admin.obj.form.LoginForm;
 import com.zhuanyi.hexo.admin.obj.vo.SystemSettingVO;
 import com.zhuanyi.hexo.admin.service.AdminService;
@@ -17,6 +19,9 @@ public class DefaultAdminServiceImpl implements AdminService {
 
     @Resource
     private AuthService defaultAuthService;
+
+    @Resource
+    private SystemSettingDao defaultSystemSettingDao;
 
     @Resource
     private SystemConfig systemConfig;
@@ -49,5 +54,10 @@ public class DefaultAdminServiceImpl implements AdminService {
         SystemSettingVO systemSettingVO = new SystemSettingVO();
         BeanUtils.copyProperties(systemConfig, systemSettingVO);
         return systemSettingVO;
+    }
+
+    @Override
+    public boolean updateSystemSetting(SystemSettingDTO systemSettingDTO) {
+        return defaultSystemSettingDao.updateSystemSetting(systemSettingDTO);
     }
 }
