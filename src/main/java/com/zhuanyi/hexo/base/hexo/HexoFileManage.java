@@ -8,11 +8,19 @@ public interface HexoFileManage {
 
     List<Article> readAllArticles();
 
+    List<Article> readAllTmpArticles();
+
     Article readArticleById(Long id);
+
+    Article readTmpArticleById(Long id);
 
     boolean saveArticle(Article article);
 
+    boolean tmpSaveArticle(Article article);
+
     boolean deleteArticleById(Long id);
+
+    boolean deleteTmpArticleById(Long id);
 
     Long getNewArticleId();
 

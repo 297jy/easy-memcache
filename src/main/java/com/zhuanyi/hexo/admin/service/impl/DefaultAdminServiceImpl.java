@@ -1,10 +1,12 @@
 package com.zhuanyi.hexo.admin.service.impl;
 
 import com.zhuanyi.hexo.admin.obj.form.LoginForm;
+import com.zhuanyi.hexo.admin.obj.vo.SystemSettingVO;
 import com.zhuanyi.hexo.admin.service.AdminService;
 import com.zhuanyi.hexo.admin.obj.vo.AdminInfoVO;
 import com.zhuanyi.hexo.admin.config.SystemConfig;
 import com.zhuanyi.hexo.auth.service.AuthService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,5 +42,12 @@ public class DefaultAdminServiceImpl implements AdminService {
     @Override
     public boolean logout() {
         return defaultAuthService.clearToken();
+    }
+
+    @Override
+    public SystemSettingVO getSystemSetting() {
+        SystemSettingVO systemSettingVO = new SystemSettingVO();
+        BeanUtils.copyProperties(systemConfig, systemSettingVO);
+        return systemSettingVO;
     }
 }

@@ -1,6 +1,7 @@
 package com.zhuanyi.hexo.admin.controller;
 
 import com.zhuanyi.hexo.admin.obj.form.LoginForm;
+import com.zhuanyi.hexo.admin.obj.vo.SystemSettingVO;
 import com.zhuanyi.hexo.admin.service.AdminService;
 import com.zhuanyi.hexo.admin.obj.vo.AdminInfoVO;
 import com.zhuanyi.hexo.auth.annotation.Auth;
@@ -40,6 +41,13 @@ public class AdminController {
     public Result logout() {
         boolean success = defaultAdminService.logout();
         return new Result().success(success ? "success" : "error");
+    }
+
+    @Auth
+    @GetMapping("/system-setting")
+    public Result getSystemSetting() {
+        SystemSettingVO systemSettingVO = defaultAdminService.getSystemSetting();
+        return new Result().success(systemSettingVO);
     }
 
 }

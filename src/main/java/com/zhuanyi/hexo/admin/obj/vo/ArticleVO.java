@@ -29,6 +29,8 @@ public class ArticleVO {
 
     private Date publishTime;
 
+    private String publishFormatTime;
+
     private String status;
 
     private String title;
@@ -44,6 +46,7 @@ public class ArticleVO {
     public ArticleVO(Article article) {
         BeanUtils.copyProperties(article, this);
         publishTime = DateUtils.toDate(article.getPublishTime(), DateUtils.PATTERN_YYYY_MM_DD_HH_MM_SS);
+        publishFormatTime = article.getPublishTime();
         if (!CollectionUtils.isEmpty(article.getCategories())) {
             categories = StringUtils.join(article.getCategories(), ",");
         }

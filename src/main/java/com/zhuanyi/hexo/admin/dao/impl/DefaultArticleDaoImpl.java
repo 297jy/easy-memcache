@@ -20,8 +20,18 @@ public class DefaultArticleDaoImpl implements ArticleDao {
     }
 
     @Override
+    public Article findTmpArticleById(Long id) {
+        return defaultHexoFileManage.readTmpArticleById(id);
+    }
+
+    @Override
     public List<Article> findAllArticles() {
         return defaultHexoFileManage.readAllArticles();
+    }
+
+    @Override
+    public List<Article> findAllTmpArticles() {
+        return defaultHexoFileManage.readAllTmpArticles();
     }
 
     @Override
@@ -32,6 +42,15 @@ public class DefaultArticleDaoImpl implements ArticleDao {
     }
 
     @Override
+    public boolean tmpSaveArticle(Article article) {
+        if (article.getId() == null) {
+            Long nextId = defaultHexoFileManage.getNewArticleId();
+            article.setId(nextId);
+        }
+        return defaultHexoFileManage.tmpSaveArticle(article);
+    }
+
+    @Override
     public boolean updateArticle(Article article) {
         return defaultHexoFileManage.saveArticle(article);
     }
@@ -39,6 +58,11 @@ public class DefaultArticleDaoImpl implements ArticleDao {
     @Override
     public boolean deleteArticleById(Long id) {
         return defaultHexoFileManage.deleteArticleById(id);
+    }
+
+    @Override
+    public boolean deleteTmpArticleById(Long id) {
+        return defaultHexoFileManage.deleteTmpArticleById(id);
     }
 
 }

@@ -9,6 +9,8 @@ public interface ArticleService {
 
     ArticleListVO findAllArticles(Integer page, Integer limit);
 
+    ArticleListVO findAllTmpArticles(Integer page, Integer limit);
+
     ArticleVO findArticleById(Long id);
 
     boolean create(ArticleDTO articleDTO);
@@ -16,5 +18,7 @@ public interface ArticleService {
     boolean update(ArticleDTO articleDTO);
 
     boolean deleteById(Long id);
+
+    boolean tmpSave(ArticleDTO articleDTO);
 
 }

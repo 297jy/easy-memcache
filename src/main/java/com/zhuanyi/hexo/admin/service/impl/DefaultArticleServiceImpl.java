@@ -26,6 +26,12 @@ public class DefaultArticleServiceImpl implements ArticleService {
         return paging(articles, page, limit);
     }
 
+    @Override
+    public ArticleListVO findAllTmpArticles(Integer page, Integer limit) {
+        List<Article> articles = defaultArticleDao.findAllTmpArticles();
+        return paging(articles, page, limit);
+    }
+
     private ArticleListVO paging(List<Article> articles, Integer page, Integer limit) {
         Collections.sort(articles);
         int startIndex = Math.min((page - 1) * limit, articles.size());
@@ -46,6 +52,9 @@ public class DefaultArticleServiceImpl implements ArticleService {
     @Override
     public ArticleVO findArticleById(Long id) {
         Article article = defaultArticleDao.findArticleById(id);
+        if (article == null) {
+            article = defaultArticleDao.findTmpArticleById(id);
+        }
         return new ArticleVO(article);
     }
 
@@ -60,12 +69,23 @@ public class DefaultArticleServiceImpl implements ArticleService {
     public boolean update(ArticleDTO articleDTO) {
         Article article = new Article();
         BeanUtils.copyProperties(articleDTO, article);
-        return defaultArticleDao.updateArticle(article);
+        if (defaultArticleDao.updateArticle(article)) {
+            defaultArticleDao.deleteTmpArticleById(article.getId());
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean deleteById(Long id) {
         return defaultArticleDao.deleteArticleById(id);
+    }
+
+    @Override
+    public boolean tmpSave(ArticleDTO articleDTO) {
+        Article article = new Article();
+        BeanUtils.copyProperties(articleDTO, article);
+        return defaultArticleDao.tmpSaveArticle(articleDTO);
     }
 
 }

@@ -29,6 +29,14 @@ public class ArticleController {
         return result ? ResultUtils.success() : ResultUtils.error();
     }
 
+    @PostMapping("/tmp-save")
+    public Result tmpSave(@RequestBody ArticleForm articleForm) {
+        ArticleDTO articleDTO = new ArticleDTO(articleForm);
+        boolean result = defaultArticleService.tmpSave(articleDTO);
+        Long id = articleDTO.getId();
+        return result ? ResultUtils.success(id) : ResultUtils.error();
+    }
+
     @GetMapping("/detail")
     public Result detail(@RequestParam Long id) {
         ArticleVO articleVO = defaultArticleService.findArticleById(id);
@@ -39,6 +47,18 @@ public class ArticleController {
     public Result list(@RequestParam Integer page, @RequestParam Integer limit) {
         ArticleListVO articleListVO = defaultArticleService.findAllArticles(page, limit);
         return articleListVO != null ? ResultUtils.success(articleListVO) : ResultUtils.error();
+    }
+
+    @GetMapping("/tmp-list")
+    public Result tmpList(@RequestParam Integer page, @RequestParam Integer limit) {
+        ArticleListVO articleListVO = defaultArticleService.findAllTmpArticles(page, limit);
+        return articleListVO != null ? ResultUtils.success(articleListVO) : ResultUtils.error();
+    }
+
+    @GetMapping("/delete")
+    public Result delete(@RequestParam Long id) {
+        boolean result = defaultArticleService.deleteById(id);
+        return result ? ResultUtils.success() : ResultUtils.error();
     }
 
 }

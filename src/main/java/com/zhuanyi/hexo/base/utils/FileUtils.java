@@ -1,8 +1,6 @@
 package com.zhuanyi.hexo.base.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +81,16 @@ public class FileUtils {
     public static boolean existFile(String path) {
         File file = new File(path);
         return file.exists();
+    }
+
+    public static boolean moveFile(String oldPath, String newPath) {
+        File oldFile = new File(oldPath);
+        File newFile = new File(newPath);
+        if (!oldFile.exists()) {
+            log.error("文件未检测到，结束程序,oldPath:{}", oldPath);
+            return false;
+        }
+        return oldFile.renameTo(newFile);
     }
 
     public static void main(String[] args) {
