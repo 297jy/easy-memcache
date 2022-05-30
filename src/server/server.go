@@ -15,14 +15,18 @@ type Service interface {
 }
 
 type Server struct {
-	ip   string
-	host string
+	Ip   string
+	Host string
 }
 
-var Provides = make([]Server, 10)
+var Provides []Server
+
+func (s *Server) String() string {
+	return fmt.Sprintf("[ip => %v, host => %v]", s.Ip, s.Host)
+}
 
 func (s *Server) discover(conn *zk.Conn) error {
-	Provides = make([]Server, 10)
+	Provides = make([]Server, 0)
 	names, _, err := conn.Children(RegisterPath)
 	if err != nil {
 		return err
@@ -33,29 +37,29 @@ func (s *Server) discover(conn *zk.Conn) error {
 			fmt.Println(gerr)
 			continue
 		}
-		var s Server
-		uerr := json.Unmarshal(data, &s)
+		var server Server
+		uerr := json.Unmarshal(data, &server)
 		if uerr != nil {
-			fmt.Println(uerr)
 			continue
 		}
-		Provides = append(Provides, s)
+		Provides = append(Provides, server)
 	}
+	fmt.Println(Provides)
 	return nil
 }
 
 func (s *Server) register(conn *zk.Conn) error {
-	if e, _, err := conn.Exists(RegisterPath); e || err != nil {
+	if e, _, err := conn.Exists(RegisterPath); !e || err != nil {
 		_, cerr := conn.Create(RegisterPath, []byte{}, 0, zk.WorldACL(zk.PermAll))
 		if cerr != nil {
 			return cerr
 		}
 	}
-	data, merr := json.Marshal(*s)
+	data, merr := json.Marshal(s)
 	if merr != nil {
 		return merr
 	}
-	_, cerr := conn.Create(RegisterPath+"/"+s.host, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	_, cerr := conn.Create(RegisterPath+"/"+s.Host, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
 	if cerr != nil {
 		return cerr
 	}
