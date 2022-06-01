@@ -1,20 +1,28 @@
 package main
 
 import (
+	"EasyMemcache/src/server"
+	"encoding/json"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
+	"log"
+	"net/http"
 	"time"
 )
 
 var (
 	hosts       = []string{"192.168.136.119:2181"}
-	path        = "/wtzk"
+	path        = "/easy-memcache-service"
 	flags int32 = zk.FlagEphemeral
 	data        = []byte("zk data 001")
 	acls        = zk.WorldACL(zk.PermAll)
 )
 
 func main() {
+	/**
+	server.LocalServer = server.Server{
+
+	}
 	// 创建监听的option，用于初始化zk
 	eventCallbackOption := zk.WithEventCallback(callback)
 	// 连接zk
@@ -25,7 +33,6 @@ func main() {
 		return
 	}
 
-	fmt.Println("ok")
 	// 开始监听path
 	_, _, _, err = conn.ExistsW(path)
 	if err != nil {
@@ -44,18 +51,72 @@ func main() {
 	}
 	// 触发删除数据操作
 	del(conn, path)
+	**/
+	s := server.NewServer("test")
+	localConn, _, err := zk.Connect(hosts, time.Second*5)
+	defer localConn.Close()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
+	go func() {
+		for {
+			data, merr := json.Marshal(s)
+			if merr != nil {
+				continue
+			}
+
+			s.Name = "test" + fmt.Sprintf("%d", time.Now().Unix())
+			_, cerr := localConn.Create("/easy-memcache-service/"+s.Name, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+			if cerr != nil {
+				fmt.Println(cerr)
+				return
+			}
+			fmt.Println("上线:" + s.Name)
+			time.Sleep(time.Duration(3) * time.Second)
+		}
+	}()
+	_, _, _, err = localConn.ChildrenW("/easy-memcache-service")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+
+	go watchZkEvent(localConn)
+
+	addr := "localhost:9998"
+	log.Println("geecache is running at", addr)
+	log.Fatal(http.ListenAndServe(addr, s))
 }
 
 // zk watch 回调函数
 func callback(event zk.Event) {
 	// zk.EventNodeCreated
 	// zk.EventNodeDeleted
-	fmt.Println("###########################")
+	fmt.Println("#########监听到服务器列表变化#########")
 	fmt.Println("path: ", event.Path)
 	fmt.Println("type: ", event.Type.String())
 	fmt.Println("state: ", event.State.String())
 	fmt.Println("---------------------------")
+}
+
+func watchZkEvent(localConn *zk.Conn) {
+	for {
+		fmt.Println("yesdsf")
+		_, _, event1, err := localConn.ChildrenW(path)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		event := <-event1
+		fmt.Println("###########################")
+		fmt.Println("path: ", event.Path)
+		fmt.Println("type: ", event.Type.String())
+		fmt.Println("state: ", event.State.String())
+		fmt.Println("---------------------------")
+	}
 }
 
 // 创建数据

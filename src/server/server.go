@@ -1,67 +1,92 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
+	"log"
+	"net/http"
+	"strings"
+	"time"
 )
 
 const RegisterPath = "/easy-memcache-service"
 
-type Service interface {
-	discover(conn *zk.Conn) error
+const defaultBasePath = "/_easycache/"
 
-	register(conn *zk.Conn) error
+type Service interface {
+	discover() error
+
+	register() error
+
+	Online()
+
+	Watch(event zk.Event)
 }
 
 type Server struct {
 	Ip   string
-	Host string
+	Name string
 }
+
+var LocalServer Server
 
 var Provides []Server
 
+var conn *zk.Conn
+
+func NewServer(name string) *Server {
+	s := &Server{
+		Ip:   fmt.Sprintf("%d", time.Now().Unix()),
+		Name: name,
+	}
+	return s
+}
+
 func (s *Server) String() string {
-	return fmt.Sprintf("[ip => %v, host => %v]", s.Ip, s.Host)
+	return fmt.Sprintf("[ip => %v, host => %v]", s.Ip, s.Name)
 }
 
-func (s *Server) discover(conn *zk.Conn) error {
-	Provides = make([]Server, 0)
-	names, _, err := conn.Children(RegisterPath)
-	if err != nil {
-		return err
-	}
-	for _, name := range names {
-		data, _, gerr := conn.Get(RegisterPath + "/" + name)
-		if gerr != nil {
-			fmt.Println(gerr)
-			continue
-		}
-		var server Server
-		uerr := json.Unmarshal(data, &server)
-		if uerr != nil {
-			continue
-		}
-		Provides = append(Provides, server)
-	}
-	fmt.Println(Provides)
-	return nil
+func (s *Server) Log(format string, v ...interface{}) {
+	log.Printf("Server %s[%s], %s", s.Ip, s.Name, fmt.Sprintf(format, v...))
 }
 
-func (s *Server) register(conn *zk.Conn) error {
-	if e, _, err := conn.Exists(RegisterPath); !e || err != nil {
-		_, cerr := conn.Create(RegisterPath, []byte{}, 0, zk.WorldACL(zk.PermAll))
-		if cerr != nil {
-			return cerr
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, defaultBasePath) {
+		panic("Server unexpected path: " + r.URL.Path)
+	}
+	s.Log("%s %s", r.Method, r.URL.Path)
+
+	parts := strings.SplitN(r.URL.Path[len(defaultBasePath):], "/", 2)
+	if len(parts) != 2 {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	groupName := parts[0]
+	key := parts[1]
+
+	fmt.Println(groupName + key)
+}
+
+func (s *Server) Watch() {
+	for {
+		_, _, e, err := conn.ChildrenW(RegisterPath)
+		if err != nil {
+			panic(err)
+		}
+		event := <-e
+		fmt.Println("###########################")
+		fmt.Println("path: ", event.Path)
+		fmt.Println("type: ", event.Type.String())
+		fmt.Println("state: ", event.State.String())
+		fmt.Println("---------------------------")
+		// 只有子节点变化才重新开始服务发现
+		if event.Type == zk.EventNodeChildrenChanged {
+			_ = s.discover()
 		}
 	}
-	data, merr := json.Marshal(s)
-	if merr != nil {
-		return merr
-	}
-	_, cerr := conn.Create(RegisterPath+"/"+s.Host, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
-	if cerr != nil {
-		return cerr
-	}
-	return nil
+}
+
+func (s *Server) Online() {
+	_ = s.register()
 }
