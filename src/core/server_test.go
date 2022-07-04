@@ -1,4 +1,4 @@
-package server
+package core
 
 import (
 	"fmt"
@@ -23,14 +23,7 @@ func TestZookeeper(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	go s.Watch()
-	//s.Online()
-	/**
-	_, _, _, err = conn.ChildrenW(RegisterPath)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}**/
+	s.Online()
 
 	addr := "localhost:9999"
 	log.Println("geecache is running at", addr)
@@ -38,7 +31,13 @@ func TestZookeeper(t *testing.T) {
 }
 
 func TestStr(t *testing.T) {
-	c := "xxxx"
-	p := "test_xxxxx_abc_test"
-	fmt.Println(p[len(c):], "_", 2)
+	x := []int{1,2,3}
+	fmt.Printf("%d_%d_%d", 1, 2, 3)
+	fmt.Println(x[0:1])
+}
+
+func getPoint() *Server{
+	return &Server{
+		Name: "test",
+	}
 }

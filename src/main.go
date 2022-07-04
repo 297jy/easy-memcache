@@ -1,7 +1,7 @@
 package main
 
 import (
-	"EasyMemcache/src/server"
+	"EasyMemcache/src/core"
 	"encoding/json"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
@@ -20,7 +20,7 @@ var (
 
 func main() {
 	/**
-	server.LocalServer = server.Server{
+	core.LocalServer = core.Server{
 
 	}
 	// 创建监听的option，用于初始化zk
@@ -52,13 +52,14 @@ func main() {
 	// 触发删除数据操作
 	del(conn, path)
 	**/
-	s := server.NewServer("test")
+	s := core.NewServer("test")
 	localConn, _, err := zk.Connect(hosts, time.Second*5)
 	defer localConn.Close()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 
 	go func() {
 		for {
@@ -71,18 +72,12 @@ func main() {
 			_, cerr := localConn.Create("/easy-memcache-service/"+s.Name, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
 			if cerr != nil {
 				fmt.Println(cerr)
-				return
+				//return
 			}
 			fmt.Println("上线:" + s.Name)
 			time.Sleep(time.Duration(3) * time.Second)
 		}
 	}()
-	_, _, _, err = localConn.ChildrenW("/easy-memcache-service")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
 
 	go watchZkEvent(localConn)
 
@@ -104,11 +99,11 @@ func callback(event zk.Event) {
 
 func watchZkEvent(localConn *zk.Conn) {
 	for {
-		fmt.Println("yesdsf")
+		fmt.Println("fdsfsf")
 		_, _, event1, err := localConn.ChildrenW(path)
 		if err != nil {
 			fmt.Println(err)
-			return
+			continue
 		}
 		event := <-event1
 		fmt.Println("###########################")

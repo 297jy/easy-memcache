@@ -1,6 +1,7 @@
-package server
+package core
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
 	"log"
@@ -18,17 +19,25 @@ type Service interface {
 
 	register() error
 
-	Online()
+	Online() error
 
-	Watch(event zk.Event)
+	WatchCluster()
 }
+
+const (
+	Running int = iota
+	Stopped
+)
 
 type Server struct {
-	Ip   string
-	Name string
+	Ip       string
+	Name     string
+	status   int
+	replicas int
 }
 
-var LocalServer Server
+type LocalServer struct {
+}
 
 var Provides []Server
 
@@ -36,14 +45,19 @@ var conn *zk.Conn
 
 func NewServer(name string) *Server {
 	s := &Server{
-		Ip:   fmt.Sprintf("%d", time.Now().Unix()),
-		Name: name,
+		status: Running,
+		Ip:     fmt.Sprintf("%d", time.Now().Unix()),
+		Name:   name,
 	}
 	return s
 }
 
 func (s *Server) String() string {
 	return fmt.Sprintf("[ip => %v, host => %v]", s.Ip, s.Name)
+}
+
+func (s *Server) Equal(p *Server) bool {
+	return s.Name == p.Name
 }
 
 func (s *Server) Log(format string, v ...interface{}) {
@@ -68,11 +82,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(groupName + key)
 }
 
-func (s *Server) Watch() {
-	for {
+func (s *Server) WatchCluster() {
+	for ; s.status == Running; {
 		_, _, e, err := conn.ChildrenW(RegisterPath)
 		if err != nil {
-			panic(err)
+			s.Log("ChildrenW error:{%s}", err)
+			continue
 		}
 		event := <-e
 		fmt.Println("###########################")
@@ -87,6 +102,50 @@ func (s *Server) Watch() {
 	}
 }
 
-func (s *Server) Online() {
+func (s *Server) Online() error {
+	go s.WatchCluster()
 	_ = s.register()
+	return nil
+}
+
+func (s *Server) discover() error {
+	Provides = make([]Server, 0)
+	names, _, err := conn.Children(RegisterPath)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		data, _, gerr := conn.Get(RegisterPath + "/" + name)
+		if gerr != nil {
+			fmt.Println(gerr)
+			continue
+		}
+		var server Server
+		uerr := json.Unmarshal(data, &server)
+		if uerr != nil {
+			s.Log("service discovery json error, %s", uerr)
+			continue
+		}
+		Provides = append(Provides, server)
+	}
+	return nil
+}
+
+func (s *Server) register() error {
+	if e, _, err := conn.Exists(RegisterPath); !e || err != nil {
+		_, cerr := conn.Create(RegisterPath, []byte{}, 0, zk.WorldACL(zk.PermAll))
+		if cerr != nil {
+			return cerr
+		}
+	}
+	data, merr := json.Marshal(s)
+	if merr != nil {
+		return merr
+	}
+	_, cerr := conn.Create(RegisterPath+"/"+s.Name, data, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
+	if cerr != nil {
+		fmt.Println(cerr)
+		return cerr
+	}
+	return nil
 }
